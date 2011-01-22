@@ -1,0 +1,285 @@
+/*
+ * File: ${class}.java
+ * Package: ${package}
+ * Project: 
+ * Generated on: ${date}
+ * From schema(s): ${schema}
+ * By: Xsd2SaxParser tool (Eric Blanchard)
+ */
+ 
+package ${package};
+
+#literal()
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+#end
+#if( $useSlf4j )
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+#end
+#literal()
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
+
+
+/**
+ * Implements a SAX parser
+ */
+#end
+public class $class extends DefaultHandler {
+#if( $useSlf4j )
+    private static final Logger LOGGER = LoggerFactory.getLogger(${class}.class);
+#end
+#literal()
+    private static boolean configured = false;
+    private static SAXParserFactory factory = null;
+    private SAXParser saxParser = null;
+    private String elementToSkip = null;
+    private int skipedElementDepth = 0;
+    private CharArrayWriter text = null;
+    private int currentDepth = 0;
+    
+#end
+    // Elements names
+#foreach( $key in $elements.keySet() )
+    private static final String $key = "$elements.get($key)";
+#end
+    
+    // Attributes names
+#foreach( $key in $attributes.keySet() )
+    private static final String $key = "$attributes.get($key)";
+#end
+    
+
+    /**
+     * Private constructor
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     */
+    private ${class}() throws ParserConfigurationException, SAXException {
+        text = new CharArrayWriter ();
+        saxParser = factory.newSAXParser();
+    }
+
+    /**
+     * Gets a new instance of $class.
+     * Ensuring that the SAX parser factory has been configured only once.
+     * @return a <b>${class}</b> instance.
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     */
+    public static $class getInstance() throws ParserConfigurationException, SAXException {
+        if (! configured) {
+            configure();
+        }
+        return new ${class}();
+    }
+
+    /**
+     * Configures the SAX parser factory.
+     * The default JRE provided SAX parser is used (controlled by
+     * <code>"javax.xml.parsers.SAXParserFactory"</code> system property.
+     */
+    public static void configure() {
+#if( $useSlf4j )
+        LOGGER.debug("configure:");
+#end
+
+        // Use the configured SAXParserFactory
+        factory = SAXParserFactory.newInstance();
+        /* Customize SAX parser */
+        factory.setNamespaceAware(true);
+        factory.setValidating(false);
+        configured = true;
+    }
+    
+    public void parseFromString(final String str) throws SAXException, IOException {
+#if( $useSlf4j )
+        LOGGER.debug("parseFrontString: str={}", str);
+#end
+        if (str == null || str.length() == 0) {
+#if( $useSlf4j )
+            LOGGER.warn("parseFrontString: null string");
+#end
+            return;
+        }
+        InputSource src = new InputSource(new StringReader(str));
+        parse(src);
+    }
+    
+    public void parse(InputStream is) throws SAXException, IOException {
+#if( $useSlf4j )
+        LOGGER.debug("parse: InputStream={}", is);
+#end
+        parse(new InputSource(is));
+    }
+    
+    public void parse(InputSource is) throws SAXException, IOException {
+#if( $useSlf4j )
+        LOGGER.debug("parse: InputSource={}", is);
+#end
+        saxParser.parse(is, this);
+    }
+    
+    /* (non-Javadoc)
+     * Resolves relative path URI entities to current directory
+     */
+    public InputSource resolveEntity(String publicId, String systemId)
+        throws SAXException {
+#if( $useSlf4j )
+        LOGGER.debug("resolveEntity: systemId={}", systemId);
+        LOGGER.debug("resolveEntity: ByPass the DTD by providing an empty input stream");
+#end
+        /* Provide an empty entity resolver */
+        return new InputSource(new StringReader(""));
+    }
+
+    /* (non-Javadoc)
+     */
+    public void processingInstruction(String target, String data) throws SAXException {
+#if( $useSlf4j )
+        LOGGER.debug("processingInstruction: target={}, data={}", target, data);
+#end
+    }
+
+    /* (non-Javadoc)
+     */
+    public void skippedEntity(String name) throws SAXException {
+#if( $useSlf4j )
+        LOGGER.debug("skippedEntity: name={}", name);
+#end
+    }
+
+    /* (non-Javadoc)
+     */
+    public void startDocument() throws SAXException {
+#if( $useSlf4j )
+        LOGGER.debug("startDocument:");
+#end
+    }
+
+ 
+    /* (non-Javadoc)
+     */
+    public void endDocument() throws SAXException {
+#if( $useSlf4j )
+        LOGGER.debug("endDocument: ");
+#end
+    }
+
+    /* (non-Javadoc)
+     */
+    public void startElement (String namespaceURI, String sName, String qName,
+        Attributes attrs) throws SAXException {
+        String eName = qName; /* element name (assuming namespaceAware) */
+
+        currentDepth++;
+#if( $useSlf4j )
+        LOGGER.debug("startElement: {}, currentDepth={}", eName, currentDepth);
+#end
+        
+        if (elementToSkip != null) {
+#if( $useSlf4j )
+            LOGGER.debug("startElement: skipping element={}", eName);
+#end
+            return;
+        }
+
+        text.reset();
+        
+#foreach( $key in $elements.keySet() )
+#if( $velocityCount > 1 )else #{else}        #{end}if (${key}.equals(eName)) {
+            //TODO Handle $elements.get($key) start element
+        } #end else {
+#if( $useSlf4j )
+           LOGGER.debug("startElement: Unknown element={}", eName);
+#end
+            /* Unknown elements fall here, so just ask to skip this unknown
+             * element (and all nested elements) */
+            elementToSkip = eName;
+            skipedElementDepth = currentDepth;
+        }
+    }
+    
+    /* (non-Javadoc)
+     */
+    public void endElement(String namespaceURI, String sName, String qName)
+        throws SAXException {
+        String eName = qName; /* element name (assuming namespaceAware) */
+
+#if( $useSlf4j )
+        LOGGER.debug("endElement: {}", eName);
+#end
+        if (elementToSkip != null) {
+            if (elementToSkip.equals(eName) && currentDepth == skipedElementDepth) {
+                elementToSkip = null;
+                skipedElementDepth = -1;
+            }
+            currentDepth--;
+            return;
+        }
+
+#foreach( $key in $elements.keySet() )
+#if( $velocityCount > 1 )else #{else}        #{end}if (${key}.equals(eName)) {
+            //TODO Handle $elements.get($key) end element
+        } #end else {
+#if( $useSlf4j )
+            LOGGER.debug("endElement: Unknown ending tag=" + eName);
+#end
+        }
+        currentDepth--;
+    }
+
+    /* (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#characters(char[], int, int)
+     */
+    public void characters(char buf[], int offset, int len)
+        throws SAXException {
+        if (elementToSkip != null) {
+            return;
+        }
+        if (len > 0) {
+            text.write (buf, offset, len);
+        }
+    }
+
+    /* (non-Javadoc)
+     */
+    public void warning(SAXParseException e) throws SAXException {
+#if( $useSlf4j )
+        LOGGER.warn("warning: XML parsing warning: " + e.toString(), e);
+#end
+    }
+
+    /* (non-Javadoc)
+     */
+    public void error(SAXParseException e) throws SAXException {
+#if( $useSlf4j )
+        LOGGER.warn("error: XML parsing error: " + e.toString(), e);
+#end
+    }
+
+    /* (non-Javadoc)
+     */
+    public void fatalError(SAXParseException e) throws SAXException {
+#if( $useSlf4j )
+        LOGGER.error("fatalError: parsing fatal error: " + e.toString(), e);
+#end
+        throw e;
+    }
+    
+    public String getText()
+    {
+        return text.toString().trim();
+    }
+}
