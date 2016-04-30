@@ -1,11 +1,11 @@
-<!--  
+<!--
  * File: assembly.xml
  * Project: Xsd2SaxParser
  * Created on: 02 Dec 2009
  * By: Eric Blanchard
  *
  -->
- 
+
  <assembly>
     <id>distrib</id>
 	<formats>
@@ -21,6 +21,16 @@
             <filtered>false</filtered>
             <includes>
                 <include>*.bat</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <lineEnding>unix</lineEnding>
+            <directory>src/main/scripts</directory>
+            <outputDirectory>xsd2saxparser/</outputDirectory>
+            <filtered>false</filtered>
+            <fileMode>0744</fileMode>
+            <includes>
+                <include>*.sh</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -51,12 +61,12 @@
             </includes>
         </fileSet>
     </fileSets>
-    
+
     <dependencySets>
         <dependencySet>
             <scope>runtime</scope>
             <outputDirectory>xsd2saxparser/lib</outputDirectory>
         </dependencySet>
     </dependencySets>
-    
+
 </assembly>
