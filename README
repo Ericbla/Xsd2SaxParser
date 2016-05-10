@@ -10,21 +10,19 @@ Run:
   - Xsd2SaxParser-*-distrib.zip
   - Xsd2SaxParser-*-distrib.tar.gz
   - Xsd2SaxParser-*-distrib (uncompressed distribution directory)
-  A *generate.bat* and *generate.sh* are provided to launch the Java
-  runtime.
+  A *generate.bat* and *generate.sh* are provided inside these files to launch
+  the Java runtime.
     > generate
   will show the usage of the command:
   usage: generate [options] <XSD file> ...
- -c,--passer-class-name <class-name>   class name for the generated parser
+ -c,--parser-class-name <class-name>   class name for the generated parser
  -n,--no-slf4j                         do not use slf4j logging in parser
  -o,--outout-dir <directory>           output directory for the generated
                                        parser source
- -p,--package <package-name>           pakcage name for generated parser
+ -p,--package <package-name>           package name for generated parser
  -t,--template-file <template-file>    alternate template file for SAX
                                        parser
  -v,--verbose                          display verbose traces
 
 License:
   LGPL 2.1
-
-

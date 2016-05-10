@@ -44,14 +44,14 @@ public class Generator {
                 "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         props.setProperty("class.resource.loader.path", ".");
         Velocity.init(props);
-        
+
     }
 
     public void execute(String[] schemaFiles, final String outputDirectory,
             final String packageName, final String className,
             final boolean useSlf4j, final String template) throws Exception {
         Template mainTemplate = Velocity.getTemplate(template);
-        
+
         Map<String, String> elements = new HashMap<String, String>();
         Map<String, String> attributes = new HashMap<String, String>();
         XSDParser xsdp = XSDParser.getInstance();
@@ -69,7 +69,7 @@ public class Generator {
                 schemaFilesStr.append(", ");
                 schemaFilesStr.append(schemaFile);
             }
-            
+
         }
 
         VelocityContext context = new VelocityContext();
@@ -112,7 +112,7 @@ public class Generator {
         Options options = new Options();
         options.addOption("v", "verbose", false, "display verbose traces");
         options.addOption(OptionBuilder.withLongOpt("package")
-                .withDescription("pakcage name for generated parser")
+                .withDescription("package name for generated parser")
                 .hasArgs(1)
                 .withArgName("package-name")
                 .isRequired()
@@ -122,7 +122,7 @@ public class Generator {
                 .hasArgs(1)
                 .withArgName("directory")
                 .create('o') );
-        options.addOption(OptionBuilder.withLongOpt("passer-class-name")
+        options.addOption(OptionBuilder.withLongOpt("parser-class-name")
                 .withDescription("class name for the generated parser")
                 .hasArgs(1)
                 .withArgName("class-name")
@@ -133,7 +133,7 @@ public class Generator {
                 .withArgName("template-file")
                 .create('t'));
         options.addOption("n", "no-slf4j", false, "do not use slf4j logging in parser");
-        
+
         try {
             // parse the command line arguments
             commandLine = clp.parse(options, args);
@@ -150,21 +150,21 @@ public class Generator {
             formatter.printHelp("generate [options] <XSD file> ... ", options);
             return;
         }
-        
+
         LOGGER.debug("main: outputDir={}, packageName={}",
                 outputDir, packageName);
         LOGGER.debug("main: className={}, verbose={}",
                 className, verbose);
-        
+
         String[] leftArgs = commandLine.getArgs();
-       
+
         LOGGER.debug("main: letfArgs={}", leftArgs);
         if (leftArgs == null || leftArgs.length == 0) {
             formatter.printHelp("generate [options] <XSD file> ... ", options);
             return;
         }
-        
-        
+
+
         Generator g = new Generator();
         g.execute(leftArgs, outputDir, packageName, className, useSlf4j,
                 template);
